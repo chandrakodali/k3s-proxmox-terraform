@@ -74,7 +74,7 @@ resource "proxmox_vm_qemu" "k3s_control_plane" {
     ide {
       ide2 {
         cloudinit {
-          storage = var.snippet_storage
+          storage = var.storage
         }
       }
     }
@@ -148,7 +148,7 @@ resource "proxmox_vm_qemu" "k3s_worker" {
     ide {
       ide2 {
         cloudinit {
-          storage = var.snippet_storage
+          storage = var.storage
         }
       }
     }
