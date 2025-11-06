@@ -75,8 +75,9 @@ The script will:
 1. Initialize Terraform
 2. Create VMs on Proxmox
 3. Wait for VMs to boot
-4. Install K3s using Ansible
-5. Save kubeconfig locally
+4. Install system utilities using Ansible
+5. Install K3s using Ansible
+6. Save kubeconfig locally
 
 ### 4. Access Your Cluster
 
@@ -126,14 +127,21 @@ sleep 60
 ssh ubuntu@192.168.1.180 "echo 'SSH OK'"
 ```
 
-### Step 6: Install K3s
+### Step 6: Install System Utilities
+```bash
+cd ansible
+ansible-playbook -i inventory.yml system-utils-install.yml
+cd ..
+```
+
+### Step 7: Install K3s
 ```bash
 cd ansible
 ansible-playbook -i inventory.yml k3s-install.yml
 cd ..
 ```
 
-### Step 7: Use Your Cluster
+### Step 8: Use Your Cluster
 ```bash
 export KUBECONFIG=$(pwd)/kubeconfig
 kubectl get nodes
@@ -152,7 +160,8 @@ k3s-proxmox-terraform/
 ├── README.md                    # This file
 └── ansible/
     ├── inventory.yml            # Ansible inventory
-    └── k3s-install.yml          # K3s installation playbook
+    ├── k3s-install.yml          # K3s installation playbook
+    └── system-utils-install.yml # System utilities installation playbook
 ```
 
 ## Customization
@@ -264,6 +273,7 @@ ansible -i ansible/inventory.yml all -m ping
 
 # Run specific playbook
 ansible-playbook -i ansible/inventory.yml ansible/k3s-install.yml
+ansible-playbook -i ansible/inventory.yml ansible/system-utils-install.yml
 
 # Check K3s status
 ansible -i ansible/inventory.yml control_plane -a "kubectl get nodes" -b

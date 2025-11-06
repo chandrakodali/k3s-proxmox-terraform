@@ -77,13 +77,19 @@ done
 
 echo -e "${GREEN}SSH connectivity confirmed!${NC}"
 
-# Step 8: Install K3s using Ansible
-echo -e "\n${GREEN}Step 8: Installing K3s cluster with Ansible...${NC}"
+# Step 8: Install system utilities using Ansible
+echo -e "\n${GREEN}Step 8: Installing system utilities with Ansible...${NC}"
+cd ansible
+ansible-playbook -i inventory.yml system-utils-install.yml
+cd ..
+
+# Step 9: Install K3s using Ansible
+echo -e "\n${GREEN}Step 9: Installing K3s cluster with Ansible...${NC}"
 cd ansible
 ansible-playbook -i inventory.yml k3s-install.yml
 cd ..
 
-# Step 9: Display cluster info
+# Step 10: Display cluster info
 echo -e "\n${GREEN}================================${NC}"
 echo -e "${GREEN}Deployment Complete!${NC}"
 echo -e "${GREEN}================================${NC}"

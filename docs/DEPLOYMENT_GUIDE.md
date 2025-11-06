@@ -42,6 +42,7 @@ Copy each of the provided files into your project directory:
 8. **setup.sh** - Setup script
 9. **ansible/inventory.yml** - Ansible inventory
 10. **ansible/k3s-install.yml** - K3s installation playbook
+11. **ansible/system-utils-install.yml** - System utilities installation playbook
 11. **docs/pve-info-checklist-example.md** - Proxmox setup checklist template
 
 **Quick way using VS Code:**
@@ -58,7 +59,7 @@ mkdir -p ansible
 # Create empty files
 touch main.tf variables.tf outputs.tf terraform.tfvars.example
 touch deploy.sh setup.sh README.md .gitignore
-touch ansible/inventory.yml ansible/k3s-install.yml
+touch ansible/inventory.yml ansible/k3s-install.yml ansible/system-utils-install.yml
 
 # Then edit each file and paste the content
 ```
@@ -149,8 +150,9 @@ The script will:
 4. Ask for confirmation ❓
 5. Create 4 VMs on Proxmox 🖥️
 6. Wait for VMs to boot ⏱️
-7. Install K3s cluster 🚀
-8. Save kubeconfig locally 📝
+7. Install system utilities 🛠️
+8. Install K3s cluster 🚀
+9. Save kubeconfig locally 📝
 
 **Expected duration:** 5-10 minutes
 
@@ -295,7 +297,15 @@ export K3S_TOKEN=$(terraform output -raw k3s_token)
 echo "K3s Token: $K3S_TOKEN"
 ```
 
-### 7. Install K3s with Ansible
+### 7. Install System Utilities with Ansible
+
+```bash
+cd ansible
+ansible-playbook -i inventory.yml system-utils-install.yml
+cd ..
+```
+
+### 8. Install K3s with Ansible
 
 ```bash
 cd ansible
@@ -303,7 +313,7 @@ ansible-playbook -i inventory.yml k3s-install.yml
 cd ..
 ```
 
-### 8. Configure Local Access
+### 9. Configure Local Access
 
 ```bash
 export KUBECONFIG=$(pwd)/kubeconfig

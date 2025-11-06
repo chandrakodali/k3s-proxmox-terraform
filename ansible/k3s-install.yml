@@ -1,29 +1,4 @@
 ---
-- name: Install System Utilities on all nodes
-  hosts: all
-  become: yes
-  tasks:
-    - name: Update apt cache
-      apt:
-        update_cache: yes
-        cache_valid_time: 3600
-
-    - name: Install QEMU guest agent
-      apt:
-        name: qemu-guest-agent
-        state: present
-
-    - name: Start and enable QEMU guest agent service
-      systemd:
-        name: qemu-guest-agent
-        state: started
-        enabled: yes
-
-    - name: Install micro editor
-      apt:
-        name: micro
-        state: present
-
 - name: Install K3s on Control Plane
   hosts: control_plane
   become: yes
