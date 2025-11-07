@@ -11,17 +11,17 @@ echo -e "${GREEN}================================${NC}"
 
 # Create directory structure
 echo -e "\n${GREEN}Creating directory structure...${NC}"
-mkdir -p ansible
+mkdir -p ansible terraform
 
 # Create files
 echo -e "${GREEN}Creating configuration files...${NC}"
 
 # Copy tfvars example to actual file if it doesn't exist
-if [ ! -f "terraform.tfvars" ]; then
-    cp terraform.tfvars.example terraform.tfvars
-    echo -e "${YELLOW}Created terraform.tfvars - Please edit it with your token secret!${NC}"
+if [ ! -f "terraform/terraform.tfvars" ]; then
+    cp terraform/terraform.tfvars.example terraform/terraform.tfvars
+    echo -e "${YELLOW}Created terraform/terraform.tfvars - Please edit it with your token secret!${NC}"
 else
-    echo -e "${YELLOW}terraform.tfvars already exists${NC}"
+    echo -e "${YELLOW}terraform/terraform.tfvars already exists${NC}"
 fi
 
 # Make scripts executable
@@ -79,14 +79,14 @@ echo -e "${GREEN}Setup Summary${NC}"
 echo -e "${GREEN}================================${NC}"
 echo ""
 echo -e "${YELLOW}Next steps:${NC}"
-echo "1. Edit terraform.tfvars and add your Proxmox API token secret"
-echo "   nano terraform.tfvars"
+echo "1. Edit terraform/terraform.tfvars and add your Proxmox API token secret"
+echo "   nano terraform/terraform.tfvars"
 echo ""
 echo "2. Review the configuration:"
-echo "   cat terraform.tfvars"
+echo "   cat terraform/terraform.tfvars"
 echo ""
 echo "3. Run the deployment:"
 echo "   ./deploy.sh"
 echo ""
 echo -e "${GREEN}Files created:${NC}"
-ls -lh *.tf *.sh terraform.tfvars* ansible/*.yml 2>/dev/null || true
+ls -lh *.sh terraform/*.tf terraform/terraform.tfvars* ansible/*.yml 2>/dev/null || true

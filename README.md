@@ -2,7 +2,7 @@
 
 This project deploys a K3s Kubernetes cluster on Proxmox VE using Terraform and Ansible.
 
-## Architecture
+## Architecture (Customizable)
 
 - **Control Plane**: 1 node (2 vCPU, 4GB RAM, 15GB disk)
 - **Workers**: 3 nodes (1 vCPU, 2GB RAM, 10GB disk each) - configurable
@@ -50,13 +50,13 @@ cd ~/k3s-proxmox-terraform
 
 ```bash
 # Copy example file
-cp terraform.tfvars.example terraform.tfvars
+cp terraform/terraform.tfvars.example terraform/terraform.tfvars
 
 # Edit with your values (IMPORTANT!)
-nano terraform.tfvars
+nano terraform/terraform.tfvars
 ```
 
-**Required changes in `terraform.tfvars`:**
+**Required changes in `terraform/terraform.tfvars`:**
 ```hcl
 proxmox_api_token_secret = "YOUR_ACTUAL_TOKEN_SECRET_HERE"
 ```
@@ -172,18 +172,20 @@ kubectl get nodes
 
 ```
 k3s-proxmox-terraform/
-├── main.tf                      # Main Terraform configuration
-├── variables.tf                 # Variable definitions
-├── outputs.tf                   # Output definitions
-├── terraform.tfvars.example     # Example variables file
-├── terraform.tfvars             # Your actual variables (gitignored)
+├── terraform/
+│   ├── main.tf                  # Main Terraform configuration
+│   ├── variables.tf             # Variable definitions
+│   ├── outputs.tf               # Output definitions
+│   ├── terraform.tfvars.example # Example variables file
+│   └── terraform.tfvars         # Your actual variables (gitignored)
+├── ansible/
+│   ├── inventory.yml            # Ansible inventory
+│   ├── k3s-install.yml          # K3s installation playbook
+│   ├── system-utils-install.yml # System utilities installation playbook
+│   └── argocd-install.yml       # ArgoCD installation playbook
 ├── deploy.sh                    # Automated deployment script
-├── README.md                    # This file
-└── ansible/
-    ├── inventory.yml            # Ansible inventory
-    ├── k3s-install.yml          # K3s installation playbook
-    ├── system-utils-install.yml # System utilities installation playbook
-    └── argocd-install.yml       # ArgoCD installation playbook
+├── setup.sh                     # Setup script
+└── README.md                    # This file
 ```
 
 ## Customization
@@ -233,7 +235,7 @@ workers:
 
 ### Change IP Addresses
 
-Edit `terraform.tfvars`:
+Edit `terraform/terraform.tfvars`:
 
 ```hcl
 control_plane_ip_start = "192.168.1.190"
@@ -242,7 +244,7 @@ worker_ip_start = "192.168.1.195"
 
 ### Change K3s Version
 
-Edit `terraform.tfvars`:
+Edit `terraform/terraform.tfvars`:
 
 ```hcl
 k3s_version = "v1.34.1+k3s1"  # Current default, change to any valid K3s version

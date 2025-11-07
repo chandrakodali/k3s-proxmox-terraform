@@ -32,19 +32,20 @@ cd k3s-proxmox-terraform
 
 Copy each of the provided files into your project directory:
 
-1. **main.tf** - Main Terraform configuration
-2. **variables.tf** - Variable definitions
-3. **outputs.tf** - Output definitions
-4. **terraform.tfvars.example** - Example variables
-5. **.gitignore** - Git ignore file
-6. **README.md** - Documentation
-7. **deploy.sh** - Automated deployment script
-8. **setup.sh** - Setup script
-9. **ansible/inventory.yml** - Ansible inventory
-10. **ansible/k3s-install.yml** - K3s installation playbook
-11. **ansible/system-utils-install.yml** - System utilities installation playbook
-12. **ansible/argocd-install.yml** - ArgoCD installation playbook
-11. **docs/pve-info-checklist-example.md** - Proxmox setup checklist template
+1. **terraform/main.tf** - Main Terraform configuration
+2. **terraform/variables.tf** - Variable definitions
+3. **terraform/outputs.tf** - Output definitions
+4. **terraform/terraform.tfvars.example** - Example variables
+5. **terraform/terraform.tfvars** - Actual variables file
+6. **.gitignore** - Git ignore file
+7. **README.md** - Documentation
+8. **deploy.sh** - Automated deployment script
+9. **setup.sh** - Setup script
+10. **ansible/inventory.yml** - Ansible inventory
+11. **ansible/k3s-install.yml** - K3s installation playbook
+12. **ansible/system-utils-install.yml** - System utilities installation playbook
+13. **ansible/argocd-install.yml** - ArgoCD installation playbook
+14. **docs/pve-info-checklist-example.md** - Proxmox setup checklist template
 
 **Quick way using VS Code:**
 1. Create files in VS Code with the exact names above
@@ -57,8 +58,11 @@ Copy each of the provided files into your project directory:
 # Create ansible directory
 mkdir -p ansible
 
+# Create directories
+mkdir -p terraform ansible docs
+
 # Create empty files
-touch main.tf variables.tf outputs.tf terraform.tfvars.example
+touch terraform/main.tf terraform/variables.tf terraform/outputs.tf terraform/terraform.tfvars.example terraform/terraform.tfvars
 touch deploy.sh setup.sh README.md .gitignore
 touch ansible/inventory.yml ansible/k3s-install.yml ansible/system-utils-install.yml ansible/argocd-install.yml
 
@@ -69,10 +73,10 @@ touch ansible/inventory.yml ansible/k3s-install.yml ansible/system-utils-install
 
 ```bash
 # Copy example to actual file
-cp terraform.tfvars.example terraform.tfvars
+cp terraform/terraform.tfvars.example terraform/terraform.tfvars
 
 # Edit with your token secret
-nano terraform.tfvars
+nano terraform/terraform.tfvars
 ```
 
 **IMPORTANT:** Replace `YOUR_TOKEN_SECRET_HERE` with your actual Proxmox API token secret!
@@ -132,10 +136,10 @@ This will:
 
 ```bash
 # View your configuration
-cat terraform.tfvars
+cat terraform/terraform.tfvars
 
 # Ensure token secret is filled in
-grep "proxmox_api_token_secret" terraform.tfvars
+grep "proxmox_api_token_secret" terraform/terraform.tfvars
 ```
 
 ### Step 7: Deploy the Cluster! 🎉
@@ -166,7 +170,7 @@ If you want to change the number of worker nodes:
 
 1. **Update Terraform configuration:**
    ```bash
-   nano terraform.tfvars
+   nano terraform/terraform.tfvars
    ```
    Change `worker_count = 3` to your desired number (e.g., `worker_count = 2`)
 
@@ -257,19 +261,25 @@ If you prefer step-by-step control:
 ### 1. Initialize Terraform
 
 ```bash
+cd terraform
 terraform init
+cd ..
 ```
 
 ### 2. Validate Configuration
 
 ```bash
+cd terraform
 terraform validate
+cd ..
 ```
 
 ### 3. Preview Changes
 
 ```bash
+cd terraform
 terraform plan
+cd ..
 ```
 
 Review the plan carefully to ensure everything looks correct.
@@ -277,7 +287,9 @@ Review the plan carefully to ensure everything looks correct.
 ### 4. Create VMs
 
 ```bash
+cd terraform
 terraform apply
+cd ..
 ```
 
 Type `yes` when prompted.
@@ -295,7 +307,9 @@ ssh ubuntu@192.168.1.180 "echo 'SSH working'"
 ### 6. Get K3s Token
 
 ```bash
+cd terraform
 export K3S_TOKEN=$(terraform output -raw k3s_token)
+cd ..
 echo "K3s Token: $K3S_TOKEN"
 ```
 
@@ -401,7 +415,9 @@ ssh ubuntu@192.168.1.180 "sudo systemctl status k3s"
 ### Get Cluster Token
 
 ```bash
+cd terraform
 terraform output -raw k3s_token
+cd ..
 ```
 
 ### Update Kubeconfig
@@ -504,7 +520,7 @@ ssh ubuntu@192.168.1.185 "curl -k https://192.168.1.180:6443"
 **Check network configuration:**
 ```bash
 # Verify all VMs use network device ID 0
-grep -A 3 "network {" main.tf
+grep -A 3 "network {" terraform/main.tf
 ```
 
 **Solution:** Ensure all VMs have `network { id = 0 }` in main.tf to ensure CloudInit properly configures network interfaces.
@@ -520,7 +536,7 @@ This project uses telmate/proxmox provider v3.0.2-rc05 which has breaking change
 - CloudInit requires explicit `ide2 cloudinit` drive
 - Serial port requires explicit configuration
 
-**Solution:** Ensure your main.tf uses the latest configuration format.
+**Solution:** Ensure your terraform/main.tf uses the latest configuration format.
 
 ---
 
@@ -530,10 +546,12 @@ This project uses telmate/proxmox provider v3.0.2-rc05 which has breaking change
 
 ```bash
 # Destroy all resources
+cd terraform
 terraform destroy
 
 # Or with auto-approve
 terraform destroy -auto-approve
+cd ..
 ```
 
 ### Option 2: Manual Cleanup
@@ -613,7 +631,7 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/cont
 ## ✅ Deployment Checklist
 
 - [ ] All files created in project directory
-- [ ] terraform.tfvars configured with API token secret
+- [ ] terraform/terraform.tfvars configured with API token secret
 - [ ] Scripts made executable (chmod +x)
 - [ ] Prerequisites installed (Terraform, Ansible, jq)
 - [ ] SSH key exists and is correct

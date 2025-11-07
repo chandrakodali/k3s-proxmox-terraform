@@ -12,9 +12,9 @@ echo -e "${GREEN}K3s on Proxmox Deployment Script${NC}"
 echo -e "${GREEN}================================${NC}"
 
 # Check if terraform.tfvars exists
-if [ ! -f "terraform.tfvars" ]; then
-    echo -e "${RED}Error: terraform.tfvars not found!${NC}"
-    echo "Please copy terraform.tfvars.example to terraform.tfvars and fill in your values"
+if [ ! -f "terraform/terraform.tfvars" ]; then
+    echo -e "${RED}Error: terraform/terraform.tfvars not found!${NC}"
+    echo "Please copy terraform/terraform.tfvars.example to terraform/terraform.tfvars and fill in your values"
     exit 1
 fi
 
@@ -27,6 +27,7 @@ fi
 
 # Step 1: Initialize Terraform
 echo -e "\n${GREEN}Step 1: Initializing Terraform...${NC}"
+cd terraform
 terraform init
 
 # Step 2: Validate configuration
@@ -62,6 +63,7 @@ sleep 60
 echo -e "\n${GREEN}Step 7: Testing SSH connectivity...${NC}"
 CONTROL_PLANE_IP=$(terraform output -json control_plane_ips | jq -r '.[0]')
 echo "Testing connection to ${CONTROL_PLANE_IP}..."
+cd ..
 
 retries=0
 max_retries=30
@@ -105,6 +107,7 @@ echo -e "${GREEN}Deployment Complete!${NC}"
 echo -e "${GREEN}================================${NC}"
 
 echo -e "\n${GREEN}Cluster Information:${NC}"
+cd terraform
 terraform output cluster_info
 
 echo -e "\n${GREEN}To access your cluster:${NC}"
@@ -116,6 +119,7 @@ echo -e "   ${YELLOW}kubectl get nodes${NC}"
 echo ""
 echo "3. SSH to control plane:"
 echo -e "   ${YELLOW}$(terraform output -raw ssh_command_control_plane)${NC}"
+cd ..
 echo ""
 if [[ "$response" =~ ^[Yy][Ee][Ss]$ ]]; then
     echo -e "\n${GREEN}ArgoCD Information:${NC}"
