@@ -77,7 +77,8 @@ The script will:
 3. Wait for VMs to boot
 4. Install system utilities using Ansible
 5. Install K3s using Ansible
-6. Save kubeconfig locally
+6. Optional: Install ArgoCD for GitOps workflows
+7. Save kubeconfig locally
 
 ### 4. Access Your Cluster
 
@@ -91,6 +92,19 @@ kubectl get pods -A
 
 # SSH to control plane
 ssh ubuntu@192.168.1.180
+```
+
+### 5. Optional: Access ArgoCD (if installed)
+
+If you chose to install ArgoCD during deployment:
+
+```bash
+# Port-forward to access ArgoCD UI
+kubectl port-forward svc/argocd-server -n argocd 8080:80
+
+# Access in browser: http://localhost:8080
+# Username: admin
+# Password: (check the ArgoCD secret or deployment output)
 ```
 
 ## Manual Deployment (Step by Step)
@@ -141,7 +155,14 @@ ansible-playbook -i inventory.yml k3s-install.yml
 cd ..
 ```
 
-### Step 8: Use Your Cluster
+### Step 8: Optional: Install ArgoCD
+```bash
+cd ansible
+ansible-playbook -i inventory.yml argocd-install.yml
+cd ..
+```
+
+### Step 9: Use Your Cluster
 ```bash
 export KUBECONFIG=$(pwd)/kubeconfig
 kubectl get nodes
@@ -281,6 +302,31 @@ ansible-playbook -i ansible/inventory.yml ansible/argocd-install.yml
 ansible -i ansible/inventory.yml control_plane -a "kubectl get nodes" -b
 ```
 
+## ArgoCD Installation
+
+### What is ArgoCD?
+ArgoCD is a declarative, GitOps continuous delivery tool for Kubernetes. It automates the deployment of applications to your Kubernetes cluster by syncing with Git repositories.
+
+### Features
+- **GitOps Workflow**: Automatically syncs applications from Git repositories
+- **Web UI**: Visual interface for managing applications
+- **Declarative**: Define your desired state in Git
+- **Multi-cluster**: Can manage multiple Kubernetes clusters
+- **Rollback**: Easy rollback to previous versions
+
+### Installation Options
+1. **During deployment**: Choose "yes" when prompted during `./deploy.sh`
+2. **Manual installation**: Run `ansible-playbook -i ansible/inventory.yml ansible/argocd-install.yml`
+
+### Accessing ArgoCD
+```bash
+# Port-forward to access UI
+kubectl port-forward svc/argocd-server -n argocd 8080:80
+
+# Get admin password
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d
+```
+
 ## Troubleshooting
 
 ### Network Device Configuration
@@ -402,14 +448,22 @@ qm destroy <VMID>
 
 After deployment, you can:
 
-1. **Install ArgoCD** (optional during deployment) for GitOps workflows
+1. **Access ArgoCD** (if installed): Set up GitOps workflows for your applications
 2. **Install a CNI plugin** (if not using default Flannel)
 3. **Deploy cert-manager** for TLS certificates
 4. **Install Helm** for package management
 5. **Setup Ingress Controller** (Nginx, Traefik)
 6. **Configure persistent storage** (Longhorn, NFS)
 7. **Setup monitoring** (Prometheus, Grafana)
-8. **Deploy applications**
+8. **Deploy applications** using ArgoCD or kubectl
+
+### Using ArgoCD for Application Deployment
+Once ArgoCD is installed, you can:
+- Create Application manifests in Git
+- Connect ArgoCD to your Git repositories
+- Automatically deploy and sync applications
+- Monitor application health through the UI
+- Rollback to previous versions if needed
 
 ## Resources
 
